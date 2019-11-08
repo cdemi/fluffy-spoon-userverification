@@ -27,11 +27,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "integration", "integration"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "performance", "performance", "{ED39EC32-14DC-42F0-81FC-44365E078CDC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fluffyspoon.registration", "src\fluffyspoon.registration\fluffyspoon.registration.csproj", "{0F12CBAA-7B9F-4AA0-BC43-626899818D02}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fluffyspoon.userverification", "src\fluffyspoon.userverification\fluffyspoon.userverification.csproj", "{0F12CBAA-7B9F-4AA0-BC43-626899818D02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fluffyspoon.registration.contracts", "src\fluffyspoon.registration.contracts\fluffyspoon.registration.contracts.csproj", "{D0E6F1B9-126E-4B35-B319-94002A646122}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fluffyspoon.userverification.contracts", "src\fluffyspoon.userverification.contracts\fluffyspoon.userverification.contracts.csproj", "{D0E6F1B9-126E-4B35-B319-94002A646122}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Registration", "Registration", "{2575B22C-D459-4CB8-9C86-F995D217F71C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserVerification", "UserVerification", "{2575B22C-D459-4CB8-9C86-F995D217F71C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

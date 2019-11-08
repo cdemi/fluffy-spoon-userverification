@@ -11,4 +11,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Orleans_CodeGenInputs Remove="Events\RegisteredUserEvent.cs" />
+  </ItemGroup>
+
 </Project>

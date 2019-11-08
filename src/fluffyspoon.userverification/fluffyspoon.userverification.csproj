@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="demofluffyspoon.contracts" Version="1.1.23" />
     <PackageReference Include="GiG.Core.Configuration" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.DistributedTracing.Web" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.HealthChecks" Version="1.2.3.209" />
@@ -19,21 +20,17 @@
     <PackageReference Include="GiG.Core.Orleans.Clustering.Consul" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.Orleans.Clustering.Kubernetes" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.Orleans.Silo" Version="1.2.3.209" />
-    <PackageReference Include="GiG.Core.Orleans.Silo.Dashboard" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.Orleans.Streams" Version="1.2.3.209" />
-    <PackageReference Include="GiG.Core.Web.Docs" Version="1.2.3.209" />
-    <PackageReference Include="GiG.Core.Web.FluentValidation" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.Web.Hosting" Version="1.2.3.209" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="8.5.1" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="3.0.0" />
     <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="OrleansDashboard" Version="3.0.3" />
-   </ItemGroup>
+  </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\fluffyspoon.registration.contracts\fluffyspoon.registration.contracts.csproj" />
+    <ProjectReference Include="..\fluffyspoon.userverification.contracts\fluffyspoon.userverification.contracts.csproj" />
   </ItemGroup>
   
 </Project>
