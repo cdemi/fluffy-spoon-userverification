@@ -11,5 +11,5 @@ spec:
       paths:
       - backend:
           serviceName: userverification
-          servicePort: 80
+          servicePort: 8080
         path: /
