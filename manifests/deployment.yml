@@ -1,0 +1,35 @@
+apiVersion : apps/v1beta1
+kind: Deployment
+metadata:
+  name: userverification 
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: userverification 
+    spec:
+      containers:
+        - name: userverification
+          env:
+          - name: ASPNETCORE_URLS
+            value: http://+:8080
+          - name: Logging__MinimumLevel 
+            value: Error 
+          - name: Orleans__MembershipProvider__Name
+            value: Kubernetes
+          image: fluffyspoon.azurecr.io/userverification
+          ports:
+          - containerPort: 8080
+          livenessProbe:
+              httpGet:
+                  path: actuator/health/live
+                  port: 8080
+              initialDelaySeconds: 5
+              periodSeconds: 10
+          readinessProbe:
+              httpGet:
+                  path: actuator/health/ready
+                  port: 8080
+              initialDelaySeconds: 5
+              periodSeconds: 10
