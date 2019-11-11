@@ -1,5 +1,6 @@
 using demofluffyspoon.contracts;
-using fluffyspoon.userverification.contracts.Grains;
+using demofluffyspoon.contracts.Grains;
+using demofluffyspoon.contracts.Models;
 using Orleans;
 using Orleans.Streams;
 using System;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace fluffyspoon.userverification.Grains
 {
+    [ImplicitStreamSubscription(nameof(UserRegisteredEvent))]
     public class UserVerificationGrain : Grain, IUserVerificationGrain, IAsyncObserver<UserRegisteredEvent>
     {
         private IAsyncStream<UserVerifiedEvent> _userVerifiedStream;

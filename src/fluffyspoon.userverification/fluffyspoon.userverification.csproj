@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="demofluffyspoon.contracts" Version="1.1.23" />
+    <PackageReference Include="demofluffyspoon.contracts" Version="1.0.0" />
     <PackageReference Include="GiG.Core.Configuration" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.DistributedTracing.Web" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.HealthChecks" Version="1.2.3.209" />
@@ -21,11 +21,13 @@
     <PackageReference Include="GiG.Core.Orleans.Clustering.Kubernetes" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.Orleans.Silo" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.Orleans.Streams" Version="1.2.3.209" />
+    <PackageReference Include="GiG.Core.Orleans.Streams.Kafka" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.Web.Hosting" Version="1.2.3.209" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="3.0.0" />
     <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Orleans.Streams.Kafka" Version="4.0.0-dev-118" />
     <PackageReference Include="OrleansDashboard" Version="3.0.3" />
   </ItemGroup>
 
