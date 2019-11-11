@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="demofluffyspoon.contracts" Version="1.0.0" />
+    <PackageReference Include="demofluffyspoon.contracts" Version="1.1.43" />
     <PackageReference Include="GiG.Core.Configuration" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.DistributedTracing.Web" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.HealthChecks" Version="1.2.3.209" />
