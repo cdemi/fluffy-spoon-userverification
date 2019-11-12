@@ -5,7 +5,10 @@
 name: 1.1$(rev:.r)
 
 trigger:
-- master
+  batch: true
+  branches:
+    include:
+    - master
 
 resources:
 - repo: self
@@ -45,7 +48,7 @@ stages:
           $(tag)
           latest
     - task: Docker@2
-      condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       displayName: push an image to container registry
       inputs:
         command: push
@@ -58,7 +61,7 @@ stages:
 - stage: Deploy
   displayName: Deploy stage
   dependsOn: Build
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
   - deployment: Deploy
     displayName: Deploy

@@ -27,7 +27,10 @@ namespace fluffyspoon.userverification.Grains
 
         public Task OnNextAsync(UserRegisteredEvent item, StreamSequenceToken token = null)
         {
-            _userVerifiedStream.OnNextAsync(new UserVerifiedEvent());
+            _userVerifiedStream.OnNextAsync(new UserVerifiedEvent()
+            {
+                Email = item.Email
+            });
 
             return Task.CompletedTask;
         }
