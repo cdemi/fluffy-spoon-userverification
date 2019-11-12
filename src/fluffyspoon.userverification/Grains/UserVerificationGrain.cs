@@ -1,9 +1,12 @@
 using demofluffyspoon.contracts;
 using demofluffyspoon.contracts.Grains;
 using demofluffyspoon.contracts.Models;
+using GiG.Core.Data.KVStores.Abstractions;
+using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Streams;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace fluffyspoon.userverification.Grains
@@ -11,7 +14,16 @@ namespace fluffyspoon.userverification.Grains
     [ImplicitStreamSubscription(nameof(UserRegisteredEvent))]
     public class UserVerificationGrain : Grain, IUserVerificationGrain, IAsyncObserver<UserRegisteredEvent>
     {
+        private readonly IDataRetriever<HashSet<string>> _blacklistedEmails;
+        private readonly ILogger<UserVerificationGrain> _logger;
+
         private IAsyncStream<UserVerifiedEvent> _userVerifiedStream;
+
+        public UserVerificationGrain(IDataRetriever<HashSet<string>> blacklistedEmails, ILogger<UserVerificationGrain> logger)
+        {
+            _blacklistedEmails = blacklistedEmails;
+            _logger = logger;
+        }
 
         public override async Task OnActivateAsync()
         {
@@ -25,14 +37,16 @@ namespace fluffyspoon.userverification.Grains
             await base.OnActivateAsync();
         }
 
-        public Task OnNextAsync(UserRegisteredEvent item, StreamSequenceToken token = null)
+        public async Task OnNextAsync(UserRegisteredEvent item, StreamSequenceToken token = null)
         {
-            _userVerifiedStream.OnNextAsync(new UserVerifiedEvent()
+            if (_blacklistedEmails.Get().Contains(item.Email))
             {
-                Email = item.Email
-            });
+                _logger.LogWarning("Blacklisted user {email}", item.Email);
 
-            return Task.CompletedTask;
+                return;
+            }
+            
+            await _userVerifiedStream.OnNextAsync(new UserVerifiedEvent { Email = item.Email });
         }
 
         public Task OnCompletedAsync()

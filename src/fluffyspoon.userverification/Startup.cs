@@ -2,6 +2,8 @@ using demofluffyspoon.contracts;
 using demofluffyspoon.contracts.Grains;
 using demofluffyspoon.contracts.Models;
 using fluffyspoon.userverification.Grains;
+using GiG.Core.Data.KVStores.Extensions;
+using GiG.Core.Data.KVStores.Providers.FileProviders.Extensions;
 using GiG.Core.DistributedTracing.Web.Extensions;
 using GiG.Core.HealthChecks.Extensions;
 using GiG.Core.Hosting.Extensions;
@@ -17,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Hosting;
 using OrleansDashboard;
+using System.Collections.Generic;
 using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
 
 namespace fluffyspoon.userverification
@@ -42,6 +45,11 @@ namespace fluffyspoon.userverification
 
             // Forwarded Headers
             services.ConfigureForwardedHeaders();
+            
+            services
+                .AddKVStores<HashSet<string>>()
+                .FromJsonFile(Configuration.GetSection("BlacklistedEmails"))
+                .AddMemoryDataStore();
         }
 
         // This method gets called by the runtime. Use this method to configure Orleans.

@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="demofluffyspoon.contracts" Version="1.1.43" />
     <PackageReference Include="GiG.Core.Configuration" Version="1.2.3.209" />
+    <PackageReference Include="GiG.Core.Data.KVStores.Providers.FileProviders" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.DistributedTracing.Web" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.HealthChecks" Version="1.2.3.209" />
     <PackageReference Include="GiG.Core.Hosting" Version="1.2.3.209" />
@@ -28,6 +29,13 @@
     </PackageReference>
     <PackageReference Include="Orleans.Streams.Kafka" Version="4.0.0-dev-118" />
     <PackageReference Include="OrleansDashboard" Version="3.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="blacklisted.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
   
 </Project>
