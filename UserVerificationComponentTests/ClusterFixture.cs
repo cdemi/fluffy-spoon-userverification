@@ -51,8 +51,9 @@ namespace UserVerificationComponentTests
         public void Configure(ISiloHostBuilder hostBuilder)
         {
             hostBuilder.AddSimpleMessageStreamProvider(Constants.StreamProviderName,
-                    options => options.FireAndForgetDelivery = false)
+                    options => options.FireAndForgetDelivery = true)
                 .AddMemoryGrainStorage("PubSubStore")
+                .AddMemoryGrainStorageAsDefault()
                 .ConfigureApplicationParts(parts =>
                 {
                     parts.AddApplicationPart(typeof(UserVerificationGrain).Assembly).WithReferences();
@@ -67,7 +68,7 @@ namespace UserVerificationComponentTests
     public class TestClientConfigurations : IClientBuilderConfigurator {
         public void Configure(IConfiguration configuration, IClientBuilder clientBuilder)
         {
-            clientBuilder.AddSimpleMessageStreamProvider(Constants.StreamProviderName, options => options.FireAndForgetDelivery = false);
+            clientBuilder.AddSimpleMessageStreamProvider(Constants.StreamProviderName, options => options.FireAndForgetDelivery = true);
         }
     }
     

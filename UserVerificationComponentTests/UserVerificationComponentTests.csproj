@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="demofluffyspoon.contracts" Version="1.1.62" />
         <PackageReference Include="Microsoft.Orleans.TestingHost" Version="3.0.2" />
         <PackageReference Include="Moq" Version="4.13.1" />
         <PackageReference Include="nunit" Version="3.12.0" />

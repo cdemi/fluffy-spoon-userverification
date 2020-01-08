@@ -8,16 +8,16 @@ using Xunit;
 
 namespace UserVerificationComponentTests
 {
-    public class UserVerificationTests: IClassFixture<ClusterFixture>, IAsyncObserver<UserVerifiedEvent>
+    public class UserVerificationTests: IClassFixture<ClusterFixture>, IAsyncObserver<UserVerificationEvent>
     {
         private readonly ClusterFixture _cluster;
-        private UserVerifiedEvent _userVerifiedEvent;
+        private UserVerificationEvent _userVerificationEvent;
         private readonly SemaphoreSlim _semaphore;
         
         public UserVerificationTests(ClusterFixture fixture)
         {
             _cluster = fixture;
-            _userVerifiedEvent = null;
+            _userVerificationEvent = null;
             _semaphore = new SemaphoreSlim(0, 1);
         }
 
@@ -25,30 +25,33 @@ namespace UserVerificationComponentTests
         public async Task UserVerification_DuplicateEmail_NotProcessed()
         {
             Guid testGuid = Guid.NewGuid();
-
+            int semaphoreTimeout = 1000;
+            UserRegisteredEvent userRegisteredEvent = new UserRegisteredEvent()
+                {Email = "testing@test.com", Name = "test1", Surname = "test2"};
 
             var streamProvider = _cluster.Cluster.Client.GetStreamProvider(Constants.StreamProviderName);
             var userRegistrationStream = streamProvider.GetStream<UserRegisteredEvent>(testGuid, nameof(UserRegisteredEvent));
-            var userVerifiedStream = streamProvider.GetStream<UserVerifiedEvent>(testGuid, nameof(UserVerifiedEvent));
-
-
-            await userVerifiedStream.SubscribeAsync(this);
-            await userRegistrationStream.OnNextAsync(new UserRegisteredEvent() {Email = "testing@test.com", Name = "test1", Surname = "test2"});
-            _semaphore.Wait(10000);
-
-            Assert.Equal("testing@test.com", _userVerifiedEvent.Email);
-            _userVerifiedEvent = null;
+            var userVerifiedStream = streamProvider.GetStream<UserVerificationEvent>(testGuid, nameof(UserVerificationEvent));
             
-            await userRegistrationStream.OnNextAsync(new UserRegisteredEvent() {Email = "testing@test.com", Name = "test1", Surname = "test2"});
+            await userVerifiedStream.SubscribeAsync(this);
+            await userRegistrationStream.OnNextAsync(userRegisteredEvent);
+            _semaphore.Wait(semaphoreTimeout);
 
-            _semaphore.Wait(10000);
+            Assert.Equal("testing@test.com", _userVerificationEvent.Email);
+            Assert.Equal(UserVerificationStatusEnum.Verified, _userVerificationEvent.Status);
+            _userVerificationEvent = null;
+            
+            await userRegistrationStream.OnNextAsync(userRegisteredEvent);
+            _semaphore.Wait(semaphoreTimeout);
 
-            Assert.Equal("testing@test.com", _userVerifiedEvent.Email);
+            Assert.NotNull(_userVerificationEvent);
+            Assert.Equal("testing@test.com", _userVerificationEvent.Email);
+            Assert.Equal(UserVerificationStatusEnum.Duplicate, _userVerificationEvent.Status);
         }
 
-        public Task OnNextAsync(UserVerifiedEvent item, StreamSequenceToken token = null)
+        public Task OnNextAsync(UserVerificationEvent item, StreamSequenceToken token = null)
         {
-            _userVerifiedEvent = item;
+            _userVerificationEvent = item;
             _semaphore.Release();
             
             return Task.CompletedTask;
