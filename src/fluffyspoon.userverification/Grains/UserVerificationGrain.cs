@@ -1,6 +1,7 @@
 using demofluffyspoon.contracts;
 using demofluffyspoon.contracts.Grains;
 using demofluffyspoon.contracts.Models;
+using fluffyspoon.userverification.States;
 using GiG.Core.Data.KVStores.Abstractions;
 using Microsoft.Extensions.Logging;
 using Orleans;
@@ -12,14 +13,16 @@ using System.Threading.Tasks;
 namespace fluffyspoon.userverification.Grains
 {
     [ImplicitStreamSubscription(nameof(UserRegisteredEvent))]
-    public class UserVerificationGrain : Grain, IUserVerificationGrain, IAsyncObserver<UserRegisteredEvent>
+    public class UserVerificationGrain : Grain<UserVerificationState>, IUserVerificationGrain,
+        IAsyncObserver<UserRegisteredEvent>
     {
         private readonly IDataRetriever<HashSet<string>> _blacklistedEmails;
         private readonly ILogger<UserVerificationGrain> _logger;
 
-        private IAsyncStream<UserVerifiedEvent> _userVerifiedStream;
+        private IAsyncStream<UserVerificationEvent> _userVerificationStream;
 
-        public UserVerificationGrain(IDataRetriever<HashSet<string>> blacklistedEmails, ILogger<UserVerificationGrain> logger)
+        public UserVerificationGrain(IDataRetriever<HashSet<string>> blacklistedEmails,
+            ILogger<UserVerificationGrain> logger)
         {
             _blacklistedEmails = blacklistedEmails;
             _logger = logger;
@@ -30,10 +33,12 @@ namespace fluffyspoon.userverification.Grains
             var streamProvider = GetStreamProvider(Constants.StreamProviderName);
 
             // Producer
-            _userVerifiedStream = streamProvider.GetStream<UserVerifiedEvent>(this.GetPrimaryKey(), nameof(UserVerifiedEvent));
+            _userVerificationStream =
+                streamProvider.GetStream<UserVerificationEvent>(this.GetPrimaryKey(), nameof(UserVerificationEvent));
 
             // Consumer
-            var userRegisteredStream = streamProvider.GetStream<UserRegisteredEvent>(this.GetPrimaryKey(), nameof(UserRegisteredEvent));
+            var userRegisteredStream =
+                streamProvider.GetStream<UserRegisteredEvent>(this.GetPrimaryKey(), nameof(UserRegisteredEvent));
             await userRegisteredStream.SubscribeAsync(this);
 
             await base.OnActivateAsync();
@@ -41,14 +46,27 @@ namespace fluffyspoon.userverification.Grains
 
         public async Task OnNextAsync(UserRegisteredEvent item, StreamSequenceToken token = null)
         {
+            var @event = new UserVerificationEvent()
+            {
+                Email = item.Email,
+                Status = UserVerificationStatusEnum.Verified
+            };
+
+            if (State.IsAlreadyVerified)
+            {
+                @event.Status = UserVerificationStatusEnum.Duplicate;
+            }
+
             if (_blacklistedEmails.Get().Contains(item.Email))
             {
-                _logger.LogWarning("Blacklisted user {email}", item.Email);
+                @event.Status = UserVerificationStatusEnum.Blocked;
 
-                return;
+                _logger.LogWarning("Blacklisted user {email}", item.Email);
             }
-            
-            await _userVerifiedStream.OnNextAsync(new UserVerifiedEvent { Email = item.Email });
+
+            await _userVerificationStream.OnNextAsync(@event);
+
+            State.IsAlreadyVerified = true;
         }
 
         public Task OnCompletedAsync()
