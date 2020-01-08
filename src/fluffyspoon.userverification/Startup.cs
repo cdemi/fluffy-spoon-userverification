@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Hosting;
+using Orleans.Streams.Kafka.Config;
 using OrleansDashboard;
 using System.Collections.Generic;
 using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
@@ -56,18 +57,22 @@ namespace fluffyspoon.userverification
         public static void ConfigureOrleans(HostBuilderContext ctx, ISiloBuilder builder)
         {
             var configuration = ctx.Configuration;
-
+            var topicConfiguration = new TopicCreationConfig
+            {
+                AutoCreate = true,
+                Partitions = 8
+            };
+            
             builder.ConfigureCluster(configuration)
                 .UseDashboard(x => x.HostSelf = false)
                 .ConfigureEndpoints()
                 .AddAssemblies(typeof(UserVerificationGrain))
-                .AddAssemblies(typeof(IUserVerificationGrain))
                 .AddKafka(Constants.StreamProviderName)
                 .WithOptions(options =>
                 {
                     options.FromConfiguration(ctx.Configuration);
-                    options.AddTopic(nameof(UserVerifiedEvent));
-                    options.AddTopic(nameof(UserRegisteredEvent));
+                    options.AddTopic(nameof(UserVerificationEvent), topicConfiguration);
+                    options.AddTopic(nameof(UserRegisteredEvent), topicConfiguration);
                 })
                 .AddJson()
                 .Build()
