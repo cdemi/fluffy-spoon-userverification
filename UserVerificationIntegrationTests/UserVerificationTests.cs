@@ -5,7 +5,6 @@ using demofluffyspoon.registration.grains.Grains;
 using fluffyspoon.userverification.Grains;
 using Orleans.TestingHost;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -40,13 +39,13 @@ namespace UserVerificationIntegrationTests
              */
             
             //Arrange
-            //Build Verification Service
             await _registrationCluster.WaitForLivenessToStabilizeAsync();
             await _registrationStatusCluster.WaitForLivenessToStabilizeAsync();
            
-//            _verificationCluster = _testHelper.GenerateTestCluster<UserVerificationGrain>();
-//            await _verificationCluster.WaitForLivenessToStabilizeAsync();
-//            await _verificationCluster.StopSiloAsync(_verificationCluster.Primary);
+            _verificationCluster = _testHelper.GenerateTestCluster<UserVerificationGrain>();
+            await _verificationCluster.WaitForLivenessToStabilizeAsync();
+            await _verificationCluster.StopSiloAsync(_verificationCluster.Primary);
+            
             IUserRegistrationGrain userRegistrationGrain = _registrationCluster.Client.GetGrain<IUserRegistrationGrain>(_faker.Internet.Email());
             Guid? userRegistrationKey = await userRegistrationGrain.RegisterAsync(_faker.Random.String2(5), _faker.Random.String2(5));
             IUserRegistrationStatusGrain userRegistrationStatusGrain = _registrationStatusCluster.Client.GetGrain<IUserRegistrationStatusGrain>((Guid) userRegistrationKey);
@@ -54,9 +53,7 @@ namespace UserVerificationIntegrationTests
             await AssertRegistrationState(userRegistrationStatusGrain, UserRegistrationStatusEnum.Pending);
 
             //Act
-//            await _verificationCluster.StartAdditionalSiloAsync();
-//            await _verificationCluster.WaitForLivenessToStabilizeAsync();
-            _verificationCluster = _testHelper.GenerateTestCluster<UserVerificationGrain>();
+            await _verificationCluster.StartAdditionalSiloAsync();
             await _verificationCluster.WaitForLivenessToStabilizeAsync();
             
             //Assert
@@ -78,37 +75,44 @@ namespace UserVerificationIntegrationTests
              */
             
             //Arrange
+            await _registrationCluster.WaitForLivenessToStabilizeAsync();
+            await _registrationStatusCluster.WaitForLivenessToStabilizeAsync();
+            
             IUserRegistrationGrain userRegistrationGrain = _registrationCluster.Client.GetGrain<IUserRegistrationGrain>(_faker.Internet.Email());
-            IUserRegistrationStatusGrain userRegistrationStatusGrain = _registrationCluster.Client.GetGrain<IUserRegistrationStatusGrain>(Guid.NewGuid());
-            await userRegistrationGrain.RegisterAsync(_faker.Random.String2(5), _faker.Random.String2(5));
+            Guid? userRegistrationKey = await userRegistrationGrain.RegisterAsync(_faker.Random.String2(5), _faker.Random.String2(5));
+            IUserRegistrationStatusGrain userRegistrationStatusGrain = _registrationStatusCluster.Client.GetGrain<IUserRegistrationStatusGrain>((Guid) userRegistrationKey);
 
             await AssertRegistrationState(userRegistrationStatusGrain, UserRegistrationStatusEnum.Pending);
 
             //Act
             //Build Verification Service
             _verificationCluster = _testHelper.GenerateTestCluster<UserVerificationGrain>();
+            await _verificationCluster.WaitForLivenessToStabilizeAsync();
             
             //Assert
             await AssertRegistrationState(userRegistrationStatusGrain, UserRegistrationStatusEnum.Verified);
             
             _registrationCluster.StopAllSilos();
-            _registrationCluster.StopAllSilos();
+            _registrationStatusCluster.StopAllSilos();
             _verificationCluster.StopAllSilos();
         }
 
         private async Task AssertRegistrationState(IUserRegistrationStatusGrain userRegistrationStatusGrain, UserRegistrationStatusEnum expectedStatus)
         {
-            RegistrationStatusState registrationState;
-            DateTime endTime = DateTime.Now.AddSeconds(60);
-            DateTime currentTime;
             
-            do
-            {
-                registrationState = await userRegistrationStatusGrain.GetAsync();
-                currentTime = DateTime.Now;
-                await Task.Delay(200);
-            } while (!registrationState.Status.Equals(expectedStatus) && currentTime < endTime);
+//            DateTime endTime = DateTime.Now.AddSeconds(60);
+//            DateTime currentTime;
             
+//            do
+//            {
+//            Thread.Sleep(10000);
+//                RegistrationStatusState registrationState = await userRegistrationStatusGrain.GetAsync();
+//                currentTime = DateTime.Now;
+//                await Task.Delay(200);
+//            } while (!registrationState.Status.Equals(expectedStatus) && currentTime < endTime);
+            
+            await Task.Delay(2000);
+            RegistrationStatusState registrationState = await userRegistrationStatusGrain.GetAsync();
             Assert.Equal(expectedStatus, registrationState.Status);
         }
         
