@@ -18,11 +18,17 @@ namespace UserVerificationIntegrationTests
 {
     public class TestHelper
     {
+        private static Guid _runId;
+
+        public TestHelper()
+        {
+            _runId = Guid.NewGuid();
+        }
+        
         public TestCluster GenerateTestCluster<T>()
         {
             var builder = new TestClusterBuilder();
             builder.AddSiloBuilderConfigurator<TestSiloConfigurations<T>>();
-            builder.AddClientBuilderConfigurator<TestClientConfigurations>();
             builder.Options.InitialSilosCount = 1;
             
             TestCluster cluster = builder.Build();
@@ -59,7 +65,8 @@ namespace UserVerificationIntegrationTests
                     Partitions = 1
                 };
                 
-                hostBuilder.ConfigureApplicationParts(parts =>
+                hostBuilder
+                    .ConfigureApplicationParts(parts =>
                     {
                         parts.AddApplicationPart(typeof(T).Assembly).WithReferences();
                     })
@@ -73,24 +80,11 @@ namespace UserVerificationIntegrationTests
                     .WithOptions(options =>
                     {
                         options.FromConfiguration(_host.Services.GetService<IConfiguration>());
-                        options.ConsumerGroupId = typeof(T).Name;
+                        options.ConsumerGroupId = typeof(T).Name + _runId;
                         options.ConsumeMode = ConsumeMode.LastCommittedMessage;
                         options.AddTopic(nameof(UserVerificationEvent), topicConfiguration);
                         options.AddTopic(nameof(UserRegisteredEvent), topicConfiguration);
                     }).Build();
-            }
-        }
-    
-        public class TestClientConfigurations : IClientBuilderConfigurator {
-            public void Configure(IConfiguration configuration, IClientBuilder clientBuilder)
-            {
-//                clientBuilder.AddKafka(Constants.StreamProviderName)
-//                    .WithOptions(options =>
-//                    {
-//                        options.FromConfiguration(configuration);
-//                        options.AddTopic(nameof(UserVerificationEvent));
-//                        options.AddTopic(nameof(UserRegisteredEvent));
-//                    });
             }
         }
     }
