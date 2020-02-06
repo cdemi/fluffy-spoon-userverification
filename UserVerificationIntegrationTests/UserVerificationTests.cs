@@ -4,7 +4,6 @@ using demofluffyspoon.contracts.Models;
 using demofluffyspoon.registration.grains.Grains;
 using fluffyspoon.userverification.Grains;
 using Orleans.TestingHost;
-using Polly;
 using System;
 using System.Threading.Tasks;
 using Xunit;
@@ -114,18 +113,17 @@ namespace UserVerificationIntegrationTests
 
         private void AssertRegistrationState(Guid registrationKey, UserRegistrationStatusEnum expectedStatus)
         {
-            RegistrationStatusState registrationState;
             IUserRegistrationStatusGrain userRegistrationStatusGrain =
                 _registrationStatusCluster.Client.GetGrain<IUserRegistrationStatusGrain>(registrationKey);
-            var responseMatches = Policy.HandleResult<bool>(x => !x)
-                .WaitAndRetry(20, retryAttempt => TimeSpan.FromMilliseconds(1000))
-                .Execute(() =>
-                {
-                    registrationState = userRegistrationStatusGrain.GetAsync().GetAwaiter().GetResult();
-                    return registrationState.Status.Equals(expectedStatus);
-                });
 
-            Assert.True(responseMatches);
+            Assert.True(TestHelper.Polly.Execute(() =>
+            {
+                RegistrationStatusState registrationState =
+                    userRegistrationStatusGrain.GetAsync().GetAwaiter().GetResult();
+
+               return registrationState.Status.Equals(expectedStatus);
+            }));
+
         }
 
         public void Dispose()
