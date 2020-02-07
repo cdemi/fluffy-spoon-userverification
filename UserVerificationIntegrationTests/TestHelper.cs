@@ -12,7 +12,6 @@ using Orleans.Hosting;
 using Orleans.Streams.Kafka.Config;
 using Orleans.TestingHost;
 using Polly;
-using Polly.Registry;
 using Polly.Retry;
 using System;
 using System.Collections.Generic;
@@ -23,11 +22,13 @@ namespace UserVerificationIntegrationTests
     {
         private static Guid _runId;
 
-        public static RetryPolicy<bool> Polly;
+        public static AsyncRetryPolicy<bool> Polly;
 
         public TestHelper()
         {
             _runId = Guid.NewGuid();
+            Polly = Policy.HandleResult<bool>(x => !x)
+                .WaitAndRetryAsync(20, retryAttempt => TimeSpan.FromMilliseconds(1000));
         }
         
         public TestCluster GenerateTestCluster<T>()
@@ -56,13 +57,9 @@ namespace UserVerificationIntegrationTests
                             .FromJsonFile(ctx.Configuration.GetSection("BlacklistedEmails"))
                             .AddMemoryDataStore();
                         
-                        services.AddSingleton<IReadOnlyPolicyRegistry<string>>(GetPolicy());
                     })
                     .ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json")).Build();
                 _host.Start();
-
-                var registry = _host.Services.GetService<IReadOnlyPolicyRegistry<string>>();
-                Polly =  registry.Get<RetryPolicy<bool>>("MyRepositoryPolicy");
             }
 
             public void Configure(ISiloHostBuilder hostBuilder)
@@ -95,17 +92,6 @@ namespace UserVerificationIntegrationTests
                         options.AddTopic(nameof(UserVerificationEvent), topicConfiguration);
                         options.AddTopic(nameof(UserRegisteredEvent), topicConfiguration);
                     }).Build();
-            }
-
-            private PolicyRegistry GetPolicy()
-            {
-                return new PolicyRegistry
-                {
-                    {
-                        "MyRepositoryPolicy", Policy.HandleResult<bool>(x => !x)
-                            .WaitAndRetry(20, retryAttempt => TimeSpan.FromMilliseconds(1000))
-                    }
-                };
             }
         }
     }

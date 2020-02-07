@@ -1,4 +1,5 @@
-﻿using demofluffyspoon.contracts;
+﻿using Bogus;
+using demofluffyspoon.contracts;
 using demofluffyspoon.contracts.Models;
 using Orleans.Streams;
 using System;
@@ -13,6 +14,7 @@ namespace UserVerificationComponentTests
         private readonly ClusterFixture _cluster;
         private UserVerificationEvent _userVerificationEvent;
         private readonly SemaphoreSlim _semaphore;
+        private readonly Faker _faker = new Faker();
         
         public UserVerificationTests(ClusterFixture fixture)
         {
@@ -26,8 +28,10 @@ namespace UserVerificationComponentTests
         {
             Guid testGuid = Guid.NewGuid();
             int semaphoreTimeout = 1000;
+
+            string testEmail = _faker.Internet.Email();
             UserRegisteredEvent userRegisteredEvent = new UserRegisteredEvent()
-                {Email = "testing@test.com", Name = "test1", Surname = "test2"};
+                {Email = testEmail, Name = _faker.Random.String2(5), Surname = _faker.Random.String2(5)};
 
             var streamProvider = _cluster.Cluster.Client.GetStreamProvider(Constants.StreamProviderName);
             var userRegistrationStream = streamProvider.GetStream<UserRegisteredEvent>(testGuid, nameof(UserRegisteredEvent));
@@ -37,7 +41,7 @@ namespace UserVerificationComponentTests
             await userRegistrationStream.OnNextAsync(userRegisteredEvent);
             _semaphore.Wait(semaphoreTimeout);
 
-            Assert.Equal("testing@test.com", _userVerificationEvent.Email);
+            Assert.Equal(testEmail, _userVerificationEvent.Email);
             Assert.Equal(UserVerificationStatusEnum.Verified, _userVerificationEvent.Status);
             _userVerificationEvent = null;
             
@@ -45,7 +49,7 @@ namespace UserVerificationComponentTests
             _semaphore.Wait(semaphoreTimeout);
 
             Assert.NotNull(_userVerificationEvent);
-            Assert.Equal("testing@test.com", _userVerificationEvent.Email);
+            Assert.Equal(testEmail, _userVerificationEvent.Email);
             Assert.Equal(UserVerificationStatusEnum.Duplicate, _userVerificationEvent.Status);
         }
 

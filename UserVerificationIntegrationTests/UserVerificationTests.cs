@@ -58,6 +58,7 @@ namespace UserVerificationIntegrationTests
             AssertRegistrationState(userRegistrationKey1, UserRegistrationStatusEnum.Pending);
 
             //Act
+            //Build Verification Service
             await _verificationCluster.StartAdditionalSiloAsync();
             await _verificationCluster.WaitForLivenessToStabilizeAsync();
             
@@ -116,13 +117,13 @@ namespace UserVerificationIntegrationTests
             IUserRegistrationStatusGrain userRegistrationStatusGrain =
                 _registrationStatusCluster.Client.GetGrain<IUserRegistrationStatusGrain>(registrationKey);
 
-            Assert.True(TestHelper.Polly.Execute(() =>
+            TestHelper.Polly.ExecuteAsync(() =>
             {
                 RegistrationStatusState registrationState =
                     userRegistrationStatusGrain.GetAsync().GetAwaiter().GetResult();
 
-               return registrationState.Status.Equals(expectedStatus);
-            }));
+               return Task.FromResult(registrationState.Status.Equals(expectedStatus));
+            });
 
         }
 
