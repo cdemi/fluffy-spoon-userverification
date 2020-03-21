@@ -1,5 +1,7 @@
-﻿using demofluffyspoon.contracts;
-using demofluffyspoon.contracts.Models;
+﻿using System;
+using System.Collections.Generic;
+using DemoFluffySpoon.Contracts;
+using DemoFluffySpoon.Contracts.Models;
 using GiG.Core.Data.KVStores.Abstractions;
 using GiG.Core.Data.KVStores.Extensions;
 using GiG.Core.Data.KVStores.Providers.FileProviders.Extensions;
@@ -13,10 +15,8 @@ using Orleans.Streams.Kafka.Config;
 using Orleans.TestingHost;
 using Polly;
 using Polly.Retry;
-using System;
-using System.Collections.Generic;
 
-namespace UserVerificationIntegrationTests
+namespace DemoFluffySpoon.UserVerification.Tests.Integration
 {
     public class TestHelper
     {
@@ -37,7 +37,7 @@ namespace UserVerificationIntegrationTests
             builder.AddSiloBuilderConfigurator<TestSiloConfigurations<T>>();
             builder.Options.InitialSilosCount = 1;
             
-            TestCluster cluster = builder.Build();
+            var cluster = builder.Build();
             cluster.Deploy();
 
             return cluster;
@@ -49,7 +49,7 @@ namespace UserVerificationIntegrationTests
 
             public TestSiloConfigurations()
             {
-                _host = new HostBuilder()
+                _host = Host.CreateDefaultBuilder()
                     .ConfigureServices((ctx, services) =>
                     {
                         services
@@ -58,7 +58,8 @@ namespace UserVerificationIntegrationTests
                             .AddMemoryDataStore();
                         
                     })
-                    .ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json")).Build();
+                    .Build();
+
                 _host.Start();
             }
 

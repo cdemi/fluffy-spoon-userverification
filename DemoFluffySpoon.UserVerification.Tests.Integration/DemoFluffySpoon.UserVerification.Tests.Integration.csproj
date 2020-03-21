@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bogus" Version="29.0.1"/>
+    <PackageReference Include="Microsoft.Orleans.TestingHost" Version="3.1.3"/>
+    <PackageReference Include="demofluffyspoon.registration.grains" Version="1.1.157"/>
+    <PackageReference Include="Moq" Version="4.13.1"/>
+    <PackageReference Include="nunit" Version="3.12.0"/>
+    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0"/>
+    <PackageReference Include="Microsoft.Orleans.Core" Version="3.1.3"/>
+    <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.1.3"/>
+    <PackageReference Include="Polly" Version="7.2.0"/>
+    <PackageReference Include="Polly.Extensions.Http" Version="3.0.0"/>
+    <PackageReference Include="xunit" Version="2.4.1"/>
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="blacklisted.json">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\DemoFluffySpoon.UserVerification\DemoFluffySpoon.UserVerification.csproj"/>
+  </ItemGroup>
+
+
+</Project>

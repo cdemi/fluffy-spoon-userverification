@@ -27,15 +27,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "integration", "integration"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "performance", "performance", "{ED39EC32-14DC-42F0-81FC-44365E078CDC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fluffyspoon.userverification", "src\fluffyspoon.userverification\fluffyspoon.userverification.csproj", "{0F12CBAA-7B9F-4AA0-BC43-626899818D02}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoFluffySpoon.UserVerification", "src\DemoFluffySpoon.UserVerification\DemoFluffySpoon.UserVerification.csproj", "{0F12CBAA-7B9F-4AA0-BC43-626899818D02}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserVerification", "UserVerification", "{2575B22C-D459-4CB8-9C86-F995D217F71C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "component", "component", "{59B7C25B-B31F-4B98-8A02-27AB1F37DB4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserVerificationComponentTests", "UserVerificationComponentTests\UserVerificationComponentTests.csproj", "{F8C310B4-433D-4406-971E-353E1F1FE3D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoFluffySpoon.UserVerification.Tests.Component", "DemoFluffySpoon.UserVerification.Tests.Component\DemoFluffySpoon.UserVerification.Tests.Component.csproj", "{F8C310B4-433D-4406-971E-353E1F1FE3D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserVerificationIntegrationTests", "UserVerificationIntegrationTests\UserVerificationIntegrationTests.csproj", "{A342FEB9-5F3C-4D08-83CF-A58CFACC72D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoFluffySpoon.UserVerification.Tests.Integration", "DemoFluffySpoon.UserVerification.Tests.Integration\DemoFluffySpoon.UserVerification.Tests.Integration.csproj", "{A342FEB9-5F3C-4D08-83CF-A58CFACC72D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

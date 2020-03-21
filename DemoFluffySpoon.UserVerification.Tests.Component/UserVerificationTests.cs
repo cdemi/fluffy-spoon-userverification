@@ -1,21 +1,23 @@
-﻿using Bogus;
-using demofluffyspoon.contracts;
-using demofluffyspoon.contracts.Models;
-using Orleans.Streams;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Bogus;
+using DemoFluffySpoon.Contracts;
+using DemoFluffySpoon.Contracts.Models;
+using Orleans.Streams;
 using Xunit;
 
-namespace UserVerificationComponentTests
+namespace DemoFluffySpoon.UserVerification.Tests.Component
 {
-    public class UserVerificationTests: IClassFixture<ClusterFixture>, IAsyncObserver<UserVerificationEvent>
+    [Trait("Category", "Component")]
+    public class UserVerificationTests : IClassFixture<ClusterFixture>, IAsyncObserver<UserVerificationEvent>
     {
         private readonly ClusterFixture _cluster;
-        private UserVerificationEvent _userVerificationEvent;
         private readonly SemaphoreSlim _semaphore;
         private readonly Faker _faker = new Faker();
-        
+
+        private UserVerificationEvent _userVerificationEvent;
+
         public UserVerificationTests(ClusterFixture fixture)
         {
             _cluster = fixture;
@@ -26,27 +28,29 @@ namespace UserVerificationComponentTests
         [Fact]
         public async Task UserVerification_DuplicateEmail_NotProcessed()
         {
-            Guid testGuid = Guid.NewGuid();
-            int semaphoreTimeout = 1000;
+            var testGuid = Guid.NewGuid();
+            const int semaphoreTimeout = 1000;
 
-            string testEmail = _faker.Internet.Email();
-            UserRegisteredEvent userRegisteredEvent = new UserRegisteredEvent()
+            var testEmail = _faker.Internet.Email();
+            var userRegisteredEvent = new UserRegisteredEvent()
                 {Email = testEmail, Name = _faker.Random.String2(5), Surname = _faker.Random.String2(5)};
 
             var streamProvider = _cluster.Cluster.Client.GetStreamProvider(Constants.StreamProviderName);
-            var userRegistrationStream = streamProvider.GetStream<UserRegisteredEvent>(testGuid, nameof(UserRegisteredEvent));
-            var userVerifiedStream = streamProvider.GetStream<UserVerificationEvent>(testGuid, nameof(UserVerificationEvent));
-            
+            var userRegistrationStream =
+                streamProvider.GetStream<UserRegisteredEvent>(testGuid, nameof(UserRegisteredEvent));
+            var userVerifiedStream =
+                streamProvider.GetStream<UserVerificationEvent>(testGuid, nameof(UserVerificationEvent));
+
             await userVerifiedStream.SubscribeAsync(this);
             await userRegistrationStream.OnNextAsync(userRegisteredEvent);
-            _semaphore.Wait(semaphoreTimeout);
+            await _semaphore.WaitAsync(semaphoreTimeout);
 
             Assert.Equal(testEmail, _userVerificationEvent.Email);
             Assert.Equal(UserVerificationStatusEnum.Verified, _userVerificationEvent.Status);
             _userVerificationEvent = null;
-            
+
             await userRegistrationStream.OnNextAsync(userRegisteredEvent);
-            _semaphore.Wait(semaphoreTimeout);
+            await _semaphore.WaitAsync(semaphoreTimeout);
 
             Assert.NotNull(_userVerificationEvent);
             Assert.Equal(testEmail, _userVerificationEvent.Email);
@@ -57,7 +61,7 @@ namespace UserVerificationComponentTests
         {
             _userVerificationEvent = item;
             _semaphore.Release();
-            
+
             return Task.CompletedTask;
         }
 

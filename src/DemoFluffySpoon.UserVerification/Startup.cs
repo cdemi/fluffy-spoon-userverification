@@ -1,7 +1,7 @@
-using demofluffyspoon.contracts;
-using demofluffyspoon.contracts.Grains;
-using demofluffyspoon.contracts.Models;
-using fluffyspoon.userverification.Grains;
+using System.Collections.Generic;
+using DemoFluffySpoon.Contracts;
+using DemoFluffySpoon.Contracts.Models;
+using DemoFluffySpoon.UserVerification.Grains;
 using GiG.Core.Data.KVStores.Extensions;
 using GiG.Core.Data.KVStores.Providers.FileProviders.Extensions;
 using GiG.Core.DistributedTracing.Web.Extensions;
@@ -20,10 +20,9 @@ using Orleans;
 using Orleans.Hosting;
 using Orleans.Streams.Kafka.Config;
 using OrleansDashboard;
-using System.Collections.Generic;
 using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
 
-namespace fluffyspoon.userverification
+namespace DemoFluffySpoon.UserVerification
 {
     public class Startup
     {
@@ -94,7 +93,6 @@ namespace fluffyspoon.userverification
             app.UseHealthChecks();
             app.UseInfoManagement();
             app.UseOrleansDashboard(new DashboardOptions { BasePath = "/dashboard" });
-
         }
     }
 }

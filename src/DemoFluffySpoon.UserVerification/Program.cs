@@ -5,7 +5,7 @@ using GiG.Core.Logging.All.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace fluffyspoon.userverification
+namespace DemoFluffySpoon.UserVerification
 {
     public class Program
     {
