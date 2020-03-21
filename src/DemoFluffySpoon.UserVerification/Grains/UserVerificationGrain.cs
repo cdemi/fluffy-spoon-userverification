@@ -1,16 +1,16 @@
-using demofluffyspoon.contracts;
-using demofluffyspoon.contracts.Grains;
-using demofluffyspoon.contracts.Models;
-using fluffyspoon.userverification.States;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using DemoFluffySpoon.Contracts;
+using DemoFluffySpoon.Contracts.Grains;
+using DemoFluffySpoon.Contracts.Models;
+using DemoFluffySpoon.UserVerification.States;
 using GiG.Core.Data.KVStores.Abstractions;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Streams;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace fluffyspoon.userverification.Grains
+namespace DemoFluffySpoon.UserVerification.Grains
 {
     [ImplicitStreamSubscription(nameof(UserRegisteredEvent))]
     public class UserVerificationGrain : Grain<UserVerificationState>, IUserVerificationGrain,

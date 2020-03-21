@@ -1,5 +1,7 @@
-﻿using demofluffyspoon.contracts;
-using fluffyspoon.userverification.Grains;
+﻿using System;
+using System.Collections.Generic;
+using DemoFluffySpoon.Contracts;
+using DemoFluffySpoon.UserVerification.Grains;
 using GiG.Core.Data.KVStores.Abstractions;
 using GiG.Core.Data.KVStores.Extensions;
 using GiG.Core.Data.KVStores.Providers.FileProviders.Extensions;
@@ -9,10 +11,8 @@ using Microsoft.Extensions.Hosting;
 using Orleans;
 using Orleans.Hosting;
 using Orleans.TestingHost;
-using System;
-using System.Collections.Generic;
 
-namespace UserVerificationComponentTests
+namespace DemoFluffySpoon.UserVerification.Tests.Component
 {
     public class ClusterFixture : IDisposable
     {
@@ -32,7 +32,7 @@ namespace UserVerificationComponentTests
     }
     
     public class TestSiloConfigurations : ISiloBuilderConfigurator {
-        private IHost _host;
+        private readonly IHost _host;
 
         public TestSiloConfigurations()
         {
@@ -71,6 +71,4 @@ namespace UserVerificationComponentTests
             clientBuilder.AddSimpleMessageStreamProvider(Constants.StreamProviderName, options => options.FireAndForgetDelivery = true);
         }
     }
-    
 }
-

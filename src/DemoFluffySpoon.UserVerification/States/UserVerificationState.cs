@@ -1,6 +1,6 @@
 using System;
 
-namespace fluffyspoon.userverification.States
+namespace DemoFluffySpoon.UserVerification.States
 {
     [Serializable]
     public class UserVerificationState
