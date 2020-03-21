@@ -8,22 +8,25 @@ using DemoFluffySpoon.UserVerification.States;
 using GiG.Core.Data.KVStores.Abstractions;
 using Microsoft.Extensions.Logging;
 using Orleans;
+using Orleans.Runtime;
 using Orleans.Streams;
 
 namespace DemoFluffySpoon.UserVerification.Grains
 {
     [ImplicitStreamSubscription(nameof(UserRegisteredEvent))]
-    public class UserVerificationGrain : Grain<UserVerificationState>, IUserVerificationGrain,
-        IAsyncObserver<UserRegisteredEvent>
+    public class UserVerificationGrain : Grain, IUserVerificationGrain, IAsyncObserver<UserRegisteredEvent>
     {
+        private readonly IPersistentState<UserVerificationState> _verificationState;
         private readonly IDataRetriever<HashSet<string>> _blacklistedEmails;
         private readonly ILogger<UserVerificationGrain> _logger;
 
         private IAsyncStream<UserVerificationEvent> _userVerificationStream;
 
-        public UserVerificationGrain(IDataRetriever<HashSet<string>> blacklistedEmails,
+        public UserVerificationGrain([PersistentState(nameof(UserVerificationState))]
+            IPersistentState<UserVerificationState> verificationState, IDataRetriever<HashSet<string>> blacklistedEmails,
             ILogger<UserVerificationGrain> logger)
         {
+            _verificationState = verificationState;
             _blacklistedEmails = blacklistedEmails;
             _logger = logger;
         }
@@ -52,7 +55,7 @@ namespace DemoFluffySpoon.UserVerification.Grains
                 Status = UserVerificationStatusEnum.Verified
             };
 
-            if (State.IsAlreadyVerified)
+            if (_verificationState.State.IsAlreadyVerified)
             {
                 @event.Status = UserVerificationStatusEnum.Duplicate;
             }
@@ -66,7 +69,9 @@ namespace DemoFluffySpoon.UserVerification.Grains
 
             await _userVerificationStream.OnNextAsync(@event);
 
-            State.IsAlreadyVerified = true;
+            _verificationState.State.IsAlreadyVerified = true;
+
+            await _verificationState.WriteStateAsync();
         }
 
         public Task OnCompletedAsync()
