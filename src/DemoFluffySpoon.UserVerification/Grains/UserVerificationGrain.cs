@@ -23,7 +23,8 @@ namespace DemoFluffySpoon.UserVerification.Grains
         private IAsyncStream<UserVerificationEvent> _userVerificationStream;
 
         public UserVerificationGrain([PersistentState(nameof(UserVerificationState))]
-            IPersistentState<UserVerificationState> verificationState, IDataRetriever<HashSet<string>> blacklistedEmails,
+            IPersistentState<UserVerificationState> verificationState,
+            IDataRetriever<HashSet<string>> blacklistedEmails,
             ILogger<UserVerificationGrain> logger)
         {
             _verificationState = verificationState;
@@ -70,7 +71,6 @@ namespace DemoFluffySpoon.UserVerification.Grains
             await _userVerificationStream.OnNextAsync(@event);
 
             _verificationState.State.IsAlreadyVerified = true;
-
             await _verificationState.WriteStateAsync();
         }
 
