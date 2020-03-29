@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1.2 AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1.3 AS base
 WORKDIR /app
 EXPOSE 8080
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1.200 AS publish
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1.201 AS publish
 WORKDIR /sln
 COPY NuGet.Config .
 COPY packages/ ./packages
